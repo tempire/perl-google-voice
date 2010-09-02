@@ -88,7 +88,7 @@ Raw xml
 
 =head2 messages
 
-List of messages in sms conversation - Google::Voice::SMS::Message objects
+List of messages in sms conversation, Google::Voice::SMS::Message objects
 
 =head2 latest
 

@@ -176,11 +176,11 @@ Send SMS message.  Returns true/false.
 
 =head2 sms_inbox
 
-List of sms messages
+List of sms messages, Google::Voice::SMS objects
 
 =head2 voicemail_inbox
 
-List of voicemail messages
+List of voicemail messages, Google::Voice::VM objects
 
 =head2 call
 
