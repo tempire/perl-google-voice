@@ -116,29 +116,6 @@ sub voicemail_inbox {
 	return map
 		Google::Voice::VM->new( $_, $meta, $self->rnr_se, $c ),
 		@{$xml->find('.gc-message')};
-	
-		#my @data;
-
-		#$xml->find('.gc-message')->each(sub {
-		#	my $self = shift;
-		#	my $id = $self->attrs->{id};
-
-		#	my $text;
-		#	$self->find('.gc-message-message-display > span')->each( sub {
-		#		$text .= shift->text . ' ';
-		#	} );
-		#	
-		#	my $conv = {
-		#		name => $self->at('.gc-message-name-link')->text,
-		#		meta => $json->{messages}->{$id},
-		#		text => $text,
-		#	};
-
-		#	push @data, $conv;
-
-		#} );
-
-		#return @data;
 }
 
 sub call {
