@@ -5,7 +5,7 @@ Requires only Mojolicious & IO::Socket::SSL
 	my $g = Google::Voice->new->login( 'user', 'pass' );
 	
 	# sms conversation
-	foreach my $sms ( $g->sms_inbox ) {
+	foreach my $sms ( $g->sms ) {
 		print $sms->name;
 		print $_->time , ':', $_->text, "\n" foreach $sms->messages;
 		
@@ -19,7 +19,7 @@ Requires only Mojolicious & IO::Socket::SSL
 	$call->cancel;
 	
 	# voicemail
-	foreach my $vm ( $g->voicemail_inbox ) {
+	foreach my $vm ( $g->voicemail ) {
 	
 		# name & transcribed text
 		print $vm->name;

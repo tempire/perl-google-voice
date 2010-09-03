@@ -148,11 +148,18 @@ google.com/voice services
 	# Send sms
 	$g->send_sms(5555555555 => 'Hello friend!');
 
-	# Print all messages in sms inbox
-	print "$_->{name}, $_->{text}\n" foreach $g->sms;
-
 	# Error code from google on fail
 	print $@ if ! $g->send_sms('invalid phone' => 'text message');
+	
+	# Print all sms conversations
+	foreach my $sms ( $g->sms ) {
+	    print $sms->name;
+	    print $_->time , ':', $_->text, "\n" foreach $sms->messages;
+	}
+
+	# connect call & cancel it
+	my $call = $g->call( '+15555555555' => '+14444444444' );
+	$call->cancel;
 
 =head1 METHODS
 
