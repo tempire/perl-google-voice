@@ -8,10 +8,8 @@ use Mojo::JSON;
 use IO::Socket::SSL;
 use Data::Dumper;
 
-use Google::Voice::SMS;
-use Google::Voice::VM;
-use Google::Voice::Call;
 use Google::Voice::Feed;
+use Google::Voice::Call;
 
 use base 'Mojo::Base';
 
