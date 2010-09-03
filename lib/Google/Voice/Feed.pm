@@ -1,4 +1,4 @@
-package Google::Voice::SMS;
+package Google::Voice::Feed;
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use Google::Voice::SMS::Message;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr( [ qw/ xml id name meta rnr_se client / ] );
+__PACKAGE__->attr( [ qw/ xml id name meta text rnr_se client / ] );
 
 sub new {
 	my $self = bless {}, shift;
@@ -21,6 +21,11 @@ sub new {
 	$self->id( $xml->attrs->{id} );
 	$self->name( $xml->at('.gc-message-name-link')->text );
 	$self->meta( $meta->{messages}->{ $self->id } );
+	
+	$self->text(
+		"@{[map $_->text, @{$xml->find('.gc-message-message-display > span')}]}"
+	);
+	
 	$self->rnr_se( $rnr_se );
 	$self->client( $client );
 	
@@ -56,15 +61,28 @@ sub delete {
 	return $json->{ok};
 }
 
+sub download {
+	my $self = shift;
+	my ($from, $to) = @_;
+
+	my $res = $self->client->get(
+		'https://www.google.com/voice/media/send_voicemail/' . $self->id
+	)->res;
+
+	$@ = $res->message and return if $res->code != 200;
+
+	return $res->content->asset;
+}
+
 1;
 
 =head1 NAME
 
-Google::Voice::SMS
+Google::Voice::Feed
 
 =head1 DESCRIPTION
 
-SMS conversation
+All feeds (voicemail, text, recorded, placed, received, missed, history
 
 =head1 ATTRIBUTES
 
@@ -80,22 +98,30 @@ Sender's name
 
 Metadata hashref
 
+=head2 text (voicemail feed only)
+
+Text transcription of voicemail
+
 =head2 xml
 
 Raw xml
 
 =head1 METHODS
 
-=head2 messages
+=head2 messages (sms feed only)
 
 List of messages in sms conversation, Google::Voice::SMS::Message objects
 
-=head2 latest
+=head2 latest (sms feed only)
 
 Most recent sms message
 
 =head2 delete
 
 Remove conversation
+
+=head2 download
+
+Download associated audio (mp3 format)
 
 =cut

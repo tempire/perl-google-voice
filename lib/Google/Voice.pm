@@ -11,6 +11,7 @@ use Data::Dumper;
 use Google::Voice::SMS;
 use Google::Voice::VM;
 use Google::Voice::Call;
+use Google::Voice::Feed;
 
 use base 'Mojo::Base';
 
@@ -42,16 +43,26 @@ sub login {
 	} );
 	
 	# rnr_se required for subsequent requests
-	$c->max_redirects(3); # 3 redirects before rnr_se is available
-	$el = $c->get('https://www.google.com/voice/inbox')
+	$c->max_redirects(4); # 3-4 redirects before rnr_se is available
+	$el = $c->get('https://www.google.com/voice#inbox')
 		->res->dom->at('input[name="_rnr_se"]');
-
+	
 	# Login not accepted
 	return unless $el;
 	
 	$self->rnr_se( $el->attrs->{value} );
 
 	return $self;
+}
+
+sub logout {
+	my $self = shift;
+	my $c = $self->client;
+	
+	$c->max_redirects(0);
+	
+	return 1 if $c->get('https://www.google.com/voice/account/signout')
+		->res->cookie('gv')->value eq 'EXPIRED';
 }
 
 sub send_sms {
@@ -73,14 +84,21 @@ sub send_sms {
 	return $json->{ok};
 }
 
-# sms meta->type == 10
-sub sms_inbox {
+for my $feed ( qw/ voicemail sms recorded placed received missed / ) {
+	no strict 'refs';
+	*{"Google::Voice::${feed}"} = sub {
+		shift->feed( 'https://www.google.com/voice/inbox/recent/' . $feed );
+	};
+}
+
+sub feed {
 	my $self = shift;
+	my $url = shift;
+
 	my $c = $self->client;
 	
 	# Multiple conversations
-	my $inbox = $c->get('https://www.google.com/voice/inbox/recent/sms/')
-		->res->dom;
+	my $inbox = $c->get( $url )->res->dom;
 
 	# metadata
 	my $meta = Mojo::JSON->new->decode(
@@ -90,31 +108,9 @@ sub sms_inbox {
 	my $xml = Mojo::DOM->new->parse(
 		$inbox->at('response > html')->text );
 
-	# Each sms conversation in a span.gc-message
+	# Each conversation in a span.gc-message
 	return map
-		Google::Voice::SMS->new( $_, $meta, $self->rnr_se, $c ),
-		@{$xml->find('.gc-message')};
-}
-
-# voicemail meta->type == 2
-sub voicemail_inbox {
-	my $self = shift;
-	my $c = $self->{client};
-	
-	my $inbox = $c->get('https://www.google.com/voice/inbox/recent/voicemail/')
-		->res->dom;
-
-	# metadata
-	my $meta = Mojo::JSON->new->decode(
-		$inbox->at('response > json')->text );
-	
-	# content
-	my $xml = Mojo::DOM->new->parse(
-		$inbox->at('response > html')->text );
-
-	# Each voicemail in a span.gc-message
-	return map
-		Google::Voice::VM->new( $_, $meta, $self->rnr_se, $c ),
+		Google::Voice::Feed->new( $_, $meta, $self->rnr_se, $c ),
 		@{$xml->find('.gc-message')};
 }
 
@@ -155,7 +151,7 @@ google.com/voice services
 	$g->send_sms(5555555555 => 'Hello friend!');
 
 	# Print all messages in sms inbox
-	print "$_->{name}, $_->{text}\n" foreach $g->sms_inbox;
+	print "$_->{name}, $_->{text}\n" foreach $g->sms;
 
 	# Error code from google on fail
 	print $@ if ! $g->send_sms('invalid phone' => 'text message');
@@ -170,17 +166,37 @@ Create object
 
 Login.  Returns object on success, false on failure.
 
+=head2 logout
+
+Logout
+
 =head2 send_sms
 
 Send SMS message.  Returns true/false.
 
-=head2 sms_inbox
+=head2 sms
 
-List of sms messages, Google::Voice::SMS objects
+List of SMS messages
 
-=head2 voicemail_inbox
+=head2 voicemail
 
-List of voicemail messages, Google::Voice::VM objects
+List of voicemail messages
+
+=head2 recorded
+
+List of recorded calls
+
+=head2 placed
+
+List of placed calls
+
+=head2 received
+
+List of placed calls
+
+=head2 missed
+
+List of missed calls
 
 =head2 call
 

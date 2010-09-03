@@ -13,6 +13,9 @@ my $phone = $ENV{GVPHONE};
 my $vm_name = $ENV{EXISTING_VOICEMAIL_NAME};
 my $vm_phone = $ENV{EXISTING_VOICEMAIL_PHONE};
 
+my $rec_name = $ENV{EXISTING_RECORDED_NAME};
+my $rec_phone = $ENV{EXISTING_RECORDED_PHONE};
+
 my $from_phone = $ENV{FROM_PHONE};
 my $to_phone = $ENV{TO_PHONE};
 
@@ -21,7 +24,7 @@ ok ! Google::Voice->new->login, 'no auth';
 ok my $g = Google::Voice->new->login( @auth ), 'correct auth';
 
 # voicemail inbox
-ok my $vm = ($g->voicemail_inbox)[0], 'voicemail inbox';
+ok my $vm = ($g->voicemail)[0], 'voicemail inbox';
 is $vm->name, $vm_name, 'name';
 is $vm->meta->{phoneNumber}, $vm_phone, 'phone';
 like $vm->text, qr/^[\w\s\.',]+$/, 'transcription';
@@ -30,13 +33,22 @@ like $vm->text, qr/^[\w\s\.',]+$/, 'transcription';
 ok my $asset = $vm->download, 'voicemail';
 ok $asset->size, $asset->size . ' bytes';
 
+# call recording
+ok my $node = ($g->recorded)[0], 'recorded calls';
+is $node->name, $rec_name, 'name';
+is $node->meta->{phoneNumber}, $rec_phone, 'phone';
+
+# download recording
+ok $asset = $node->download, 'recording';
+ok $asset->size, $asset->size . ' bytes';
+
 # sms
 ok ! $g->send_sms( 'invalid #' => 'message' ), 'sms fail';
 is $@, 20, 'error';
 ok $g->send_sms( $phone => 'A' ), 'sms';
 
 # sms inbox
-ok my $conv = ($g->sms_inbox)[0], 'sms inbox';
+ok my $conv = ($g->sms)[0], 'sms inbox';
 like $conv->id, qr/^\w{40}$/, 'id';
 is $conv->name, $name, 'name';
 is $conv->meta->{phoneNumber}, $phone, 'phone';
@@ -59,14 +71,23 @@ ok $conv->latest->outbound, 'latest message';
 
 # delete conversation
 my $id = $conv->id;
-#ok $g->delete( $conv ), 'delete';
 ok $conv->delete, 'delete';
-isnt +($g->sms_inbox)[0]->id, $id, 'deleted';
+isnt +($g->sms)[0]->id, $id, 'deleted';
 
 # call
 ok ! $g->call('invalid #' => 'invalid #'), 'invalid phone numbers';
 is $@, 'Cannot complete call.', 'error';
 ok my $call = $g->call($from_phone => $to_phone), 'call';
 ok $call->cancel, 'cancel';
+
+# other feeds
+for my $feed ( qw/ recorded placed received missed / ) {
+	ok my $node = ($g->received)[0], 'recorded calls';
+	is $node->name, $name, 'name';
+	is $node->meta->{phoneNumber}, $phone, 'phone';
+}
+
+ok $g->logout, 'logout';
+# ok ! $g->sms, 'logged out';
 
 done_testing;
