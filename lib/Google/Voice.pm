@@ -53,15 +53,15 @@ sub login {
 	return $self;
 }
 
-sub logout {
-	my $self = shift;
-	my $c = $self->client;
-	
-	$c->max_redirects(0);
-	
-	return 1 if $c->get('https://www.google.com/voice/account/signout')
-		->res->cookie('gv')->value eq 'EXPIRED';
-}
+#sub logout {
+#	my $self = shift;
+#	my $c = $self->client;
+#	
+#	$c->max_redirects(0);
+#	
+#	return 1 if $c->get('https://www.google.com/voice/account/signout')
+#		->res->cookie('gv')->value eq 'EXPIRED';
+#}
 
 sub send_sms {
 	my $self = shift;
@@ -82,7 +82,7 @@ sub send_sms {
 	return $json->{ok};
 }
 
-for my $feed ( qw/ all starred spam trash history voicemail 
+for my $feed ( qw/ all starred spam trash voicemail 
 		sms recorded placed received missed / ) {
 	
 	no strict 'refs';
@@ -173,9 +173,9 @@ Create object
 
 Login.  Returns object on success, false on failure.
 
-=head2 logout
+=head2 call
 
-Logout
+Connect two phone numbers
 
 =head2 send_sms
 
@@ -205,9 +205,17 @@ List of placed calls
 
 List of missed calls
 
-=head2 call
+=head2 starred
 
-Connect two phone numbers
+List of starred items (call, sms, or voicemail)
+
+=head2 spam
+
+List of items marked as spam (call, sms, or voicemail)
+
+=head2 all
+
+List of all items (call, sms, or voicemail)
 
 =head1 SEE ALSO
 

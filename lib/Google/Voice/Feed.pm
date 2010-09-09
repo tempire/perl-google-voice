@@ -32,9 +32,8 @@ sub new {
 	$self->id( $xml->attrs->{id} );
 	$self->name( $xml->at('.gc-message-name-link')->text );
 	$self->meta( $meta->{messages}->{ $self->id } );
-	$self->type( FEED_TYPE->{ $meta->{type} } );
-warn Dumper $self->meta;
-<STDIN>;
+	$self->type( FEED_TYPE->{ $self->meta->{type} } );
+	
 	$self->text(
 		"@{[map $_->text, @{$xml->find('.gc-message-message-display > span')}]}"
 	);

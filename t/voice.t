@@ -80,14 +80,16 @@ is $@, 'Cannot complete call.', 'error';
 ok my $call = $g->call($from_phone => $to_phone), 'call';
 ok $call->cancel, 'cancel';
 
-# other feeds
-for my $feed ( qw/ recorded placed received missed / ) {
-	ok my $node = ($g->received)[0], 'recorded calls';
-	is $node->name, $name, 'name';
-	is $node->meta->{phoneNumber}, $phone, 'phone';
+# special feeds
+ok +($g->all)[0], 'all feed';
+ok +($g->spam)[0], 'spam feed';
+
+# all other feeds
+for my $feed ( qw/ recorded placed received missed starred trash / ) {
+	ok my $node = ($g->$feed)[0], "$feed feed item";
+	is $node->type, $feed, 'type';
 }
 
-ok $g->logout, 'logout';
-# ok ! $g->sms, 'logged out';
+#ok $g->logout, 'logout';
 
 done_testing;
