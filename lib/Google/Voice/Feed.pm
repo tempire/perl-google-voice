@@ -8,7 +8,18 @@ use Google::Voice::SMS::Message;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr( [ qw/ xml id name meta text rnr_se client / ] );
+use constant FEED_TYPE => {
+	2 	=> 'voicemail',
+	10	=> 'sms',
+	4	=> 'recorded',
+	13	=> 'placed',
+	1	=> 'received',
+	0	=> 'missed',
+	11	=> 'trash',
+	10	=> 'starred',
+};
+
+__PACKAGE__->attr( [ qw/ xml id type name meta text rnr_se client / ] );
 
 sub new {
 	my $self = bless {}, shift;
@@ -21,7 +32,9 @@ sub new {
 	$self->id( $xml->attrs->{id} );
 	$self->name( $xml->at('.gc-message-name-link')->text );
 	$self->meta( $meta->{messages}->{ $self->id } );
-	
+	$self->type( FEED_TYPE->{ $meta->{type} } );
+warn Dumper $self->meta;
+<STDIN>;
 	$self->text(
 		"@{[map $_->text, @{$xml->find('.gc-message-message-display > span')}]}"
 	);

@@ -82,7 +82,9 @@ sub send_sms {
 	return $json->{ok};
 }
 
-for my $feed ( qw/ voicemail sms recorded placed received missed / ) {
+for my $feed ( qw/ all starred spam trash history voicemail 
+		sms recorded placed received missed / ) {
+	
 	no strict 'refs';
 	*{"Google::Voice::${feed}"} = sub {
 		shift->feed( 'https://www.google.com/voice/inbox/recent/' . $feed );
@@ -209,7 +211,7 @@ Connect two phone numbers
 
 =head1 SEE ALSO
 
-L<Mojo::Client>
+L<Mojo::Client>, L<Mojo::DOM>
 
 =head1 VERSION
 
