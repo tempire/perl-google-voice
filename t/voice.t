@@ -6,8 +6,12 @@ use Test::Mojo;
 use Google::Voice;
 
 plan skip_all => 'Set TEST_ONLINE environment variable to enable tests. '
-  . 'Requires an active Google Voice account.'
+  . 'Requires an active Google Voice account. '
+  . 'See t/voice.t to set appropriate environment variables.'
   unless $ENV{TEST_ONLINE};
+
+warn
+  'NOTE: Environment variables must be set in t/voice.t for tests to succeed';
 
 plan tests => 50;
 

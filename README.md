@@ -1,4 +1,10 @@
-Requires only Mojolicious & IO::Socket::SSL
+Google Voice library for Perl.  
+
+ - Handles all google voice functions
+ - No parsing required - all data available in perl objects
+ - Only two pre-requisites:
+ 		- Mojolicious
+		- IO::Socket::SSL
 
 	use Google::Voice;
 	
