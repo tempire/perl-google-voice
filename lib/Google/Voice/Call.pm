@@ -5,35 +5,35 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr( [ qw/ from to rnr_se client / ] );
+__PACKAGE__->attr([qw/ from to rnr_se client /]);
 
 sub new {
-	my $self = bless {}, shift;
+    my $self = bless {}, shift;
 
-	$self->from( shift );
-	$self->to( shift );
-	$self->rnr_se( shift );
-	$self->client( shift );
-	
-	return $self;
+    $self->from(shift);
+    $self->to(shift);
+    $self->rnr_se(shift);
+    $self->client(shift);
+
+    return $self;
 }
 
 sub cancel {
-	my $self = shift;
-	my ($from, $to) = @_;
+    my $self = shift;
+    my ($from, $to) = @_;
 
-	my $json = $self->client->post_form(
-		'https://www.google.com/voice/call/cancel/' => {
-			forwardingNumber => undef,
-			outgoingNumber => undef,
-			cancelType => 'C2C',
-			_rnr_se => $self->rnr_se
-		}
-	)->res->json;
+    my $json = $self->client->post_form(
+        'https://www.google.com/voice/call/cancel/' => {
+            forwardingNumber => undef,
+            outgoingNumber   => undef,
+            cancelType       => 'C2C',
+            _rnr_se          => $self->rnr_se
+        }
+    )->res->json;
 
-	$@ = $json->{data}->{code} and return unless $json->{ok};
+    $@ = $json->{data}->{code} and return unless $json->{ok};
 
-	return $json->{ok};
+    return $json->{ok};
 }
 
 1;

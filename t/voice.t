@@ -3,25 +3,35 @@ use warnings;
 
 use Test::More;
 use Test::Mojo;
-use Data::Dumper;
 use Google::Voice;
 
-my $name = $ENV{GVNAME};
-my @auth = ($ENV{GVUSER}, $ENV{GVPASS});
-my $phone = $ENV{GVPHONE};
+plan skip_all => 'Set TEST_ONLINE environment variable to enable tests. '
+  . 'Requires an active Google Voice account.'
+  unless $ENV{TEST_ONLINE};
 
-my $vm_name = $ENV{EXISTING_VOICEMAIL_NAME};
-my $vm_phone = $ENV{EXISTING_VOICEMAIL_PHONE};
+plan tests => 50;
 
-my $rec_name = $ENV{EXISTING_RECORDED_NAME};
-my $rec_phone = $ENV{EXISTING_RECORDED_PHONE};
+# Full name on account
+my $name  = $ENV{GVNAME};
+my @auth  = ($ENV{GVUSER}, $ENV{GVPASS});
+my $phone = $ENV{GVPHONE};                  # format: +15555555555
 
-my $from_phone = $ENV{FROM_PHONE};
-my $to_phone = $ENV{TO_PHONE};
+# Lastest voicemail
+my $vm_name  = $ENV{EXISTING_VOICEMAIL_NAME};
+my $vm_phone = $ENV{EXISTING_VOICEMAIL_PHONE};    # format: +15555555555
+
+# Latest recording
+my $rec_name  = $ENV{EXISTING_RECORDED_NAME};
+my $rec_phone = $ENV{EXISTING_RECORDED_PHONE};    # format: +15555555555
+
+# Real phone numbers to place sample call - real phones may ring
+my $from_phone = $ENV{FROM_PHONE};                # format: +15555555555
+my $to_phone   = $ENV{TO_PHONE};                  # format: +15555555555
+
 
 # Login
-ok ! Google::Voice->new->login, 'no auth';
-ok my $g = Google::Voice->new->login( @auth ), 'correct auth';
+ok !Google::Voice->new->login, 'no auth';
+ok my $g = Google::Voice->new->login(@auth), 'correct auth';
 
 # voicemail inbox
 ok my $vm = ($g->voicemail)[0], 'voicemail inbox';
@@ -43,9 +53,9 @@ ok $asset = $node->download, 'recording';
 ok $asset->size, $asset->size . ' bytes';
 
 # sms
-ok ! $g->send_sms( 'invalid #' => 'message' ), 'sms fail';
+ok !$g->send_sms('invalid #' => 'message'), 'sms fail';
 is $@, 20, 'error';
-ok $g->send_sms( $phone => 'A' ), 'sms';
+ok $g->send_sms($phone => 'A'), 'sms';
 
 # sms inbox
 ok my $conv = ($g->sms)[0], 'sms inbox';
@@ -58,12 +68,12 @@ my @m = $conv->messages;
 cmp_ok @m, '>=', 2, 'at least 2 messages';
 
 ok $m[0]->inbound, 'inbound';
-ok ! $m[0]->outbound, 'not inbound';
+ok !$m[0]->outbound, 'not inbound';
 like $m[0]->time, qr/^\d{1,2}:\d{2} \w{2}$/, 'time';
 is $m[0]->text, 'A', 'text';
 
 ok $m[1]->outbound, 'outbound';
-ok ! $m[1]->inbound, 'not inbound';
+ok !$m[1]->inbound, 'not inbound';
 like $m[1]->time, qr/^\d{1,2}:\d{2} \w{2}$/, 'time';
 is $m[1]->text, 'A', 'text';
 
@@ -72,24 +82,20 @@ ok $conv->latest->outbound, 'latest message';
 # delete conversation
 my $id = $conv->id;
 ok $conv->delete, 'delete';
-isnt +($g->sms)[0]->id, $id, 'deleted';
+isnt + ($g->sms)[0]->id, $id, 'deleted';
 
 # call
-ok ! $g->call('invalid #' => 'invalid #'), 'invalid phone numbers';
+ok !$g->call('invalid #' => 'invalid #'), 'invalid phone numbers';
 is $@, 'Cannot complete call.', 'error';
 ok my $call = $g->call($from_phone => $to_phone), 'call';
 ok $call->cancel, 'cancel';
 
 # special feeds
-ok +($g->all)[0], 'all feed';
-ok +($g->spam)[0], 'spam feed';
+ok + ($g->all)[0],  'all feed';
+ok + ($g->spam)[0], 'spam feed';
 
 # all other feeds
-for my $feed ( qw/ recorded placed received missed starred trash / ) {
-	ok my $node = ($g->$feed)[0], "$feed feed item";
-	is $node->type, $feed, 'type';
+for my $feed (qw/ recorded placed received missed starred trash /) {
+    ok my $node = ($g->$feed)[0], "$feed feed item";
+    is $node->type, $feed, 'type';
 }
-
-#ok $g->logout, 'logout';
-
-done_testing;

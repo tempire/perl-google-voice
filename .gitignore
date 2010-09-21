@@ -2,5 +2,4 @@
 .DS_Store
 a.pl
 env
-fixtures
 cover_db

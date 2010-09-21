@@ -3,34 +3,33 @@ package Google::Voice::SMS::Message;
 use strict;
 use warnings;
 
-use Data::Dumper;
 use Mojo::ByteStream;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr( [ qw/ text time inbound outbound xml rnr_se client / ] );
+__PACKAGE__->attr([qw/ text time inbound outbound xml rnr_se client /]);
 
 sub new {
-	my $self = bless {}, shift;
-	my $xml = shift;
-	my $meta = shift;
-	
-	$self->rnr_se( shift );
-	$self->client( shift );
+    my $self = bless {}, shift;
+    my $xml  = shift;
+    my $meta = shift;
 
-	my $from = Mojo::ByteStream->new(
-		$xml->at('.gc-message-sms-from')->text )->trim;
+    $self->rnr_se(shift);
+    $self->client(shift);
 
-	my $time = Mojo::ByteStream->new(
-		$xml->at('.gc-message-sms-time')->text )->trim;
+    my $from =
+      Mojo::ByteStream->new($xml->at('.gc-message-sms-from')->text)->trim;
 
-	$self->xml( $xml );
-	$self->text( $xml->at('.gc-message-sms-text')->text );
-	$self->time( $time );
-	$self->inbound( $from eq 'Me:' );
-	$self->outbound( $from ne 'Me:' );
+    my $time =
+      Mojo::ByteStream->new($xml->at('.gc-message-sms-time')->text)->trim;
 
-	return $self;
+    $self->xml($xml);
+    $self->text($xml->at('.gc-message-sms-text')->text);
+    $self->time($time);
+    $self->inbound($from eq 'Me:');
+    $self->outbound($from ne 'Me:');
+
+    return $self;
 }
 
 1;
