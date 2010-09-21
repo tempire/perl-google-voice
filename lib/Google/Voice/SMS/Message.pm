@@ -44,7 +44,8 @@ One message in an sms conversation
 
 =head1 USAGE
 
-$sms_conversation->message->[0]->delete;
+  print "Inbound message" if $sms_message->inbound;
+  print $sms_message->text;
 
 =head1 ATTRIBUTES
 
