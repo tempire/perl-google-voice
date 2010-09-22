@@ -151,6 +151,21 @@ google.com/voice services
 	foreach my $sms ( $g->sms ) {
 	    print $sms->name;
 	    print $_->time , ':', $_->text, "\n" foreach $sms->messages;
+
+		# Delete conversation
+		$sms->delete;
+	}
+
+	# Loop through voicemail
+	foreach my $vm ( $g->voicemail ) {
+		print "From: " . $vm->meta->{phoneNumber} . "\n";
+		print "Transcription:" . $vm->text . "\n";
+		
+		# Download mp3
+		$vm->download->move_to( $vm->id . '.mp3' );
+
+		# Delete voicemail
+		$vm->delete;
 	}
 
 	# connect call & cancel it
