@@ -10,8 +10,19 @@ Example
 
 	use Google::Voice;
 	
-	my $g = Google::Voice->new->login( 'user', 'pass' );
+	my $g = Google::Voice->new->login('username', 'password');
+
+	# Send sms
+	$g->send_sms(5555555555 => 'Hello friend!');
+
+	# Error code from google on fail
+	print $@ if ! $g->send_sms('invalid phone' => 'text message');
 	
+	# connect call & cancel it
+	my $call = $g->call( '+15555555555' => '+14444444444' );
+	$call->cancel;
+
+
 	# sms conversation
 	foreach my $sms ( $g->sms ) {
 		print $sms->name;
@@ -19,12 +30,6 @@ Example
 		
 		$sms->delete;
 	}
-	
-	$g->send_sms( '+15555555555' => 'Hello friend!' );
-	
-	# connect call & cancel it
-	my $call = $g->call( '+15555555555' => '+14444444444' );
-	$call->cancel;
 	
 	# loop through voicemail messages
 	foreach my $vm ( $g->voicemail ) {

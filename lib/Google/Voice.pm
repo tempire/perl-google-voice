@@ -139,6 +139,8 @@ google.com/voice services
 
 =head1 USAGE
 
+	use Google::Voice;
+
 	my $g = Google::Voice->new->login('username', 'password');
 
 	# Send sms
@@ -146,6 +148,11 @@ google.com/voice services
 
 	# Error code from google on fail
 	print $@ if ! $g->send_sms('invalid phone' => 'text message');
+	
+	# connect call & cancel it
+	my $call = $g->call( '+15555555555' => '+14444444444' );
+	$call->cancel;
+
 	
 	# Print all sms conversations
 	foreach my $sms ( $g->sms ) {
@@ -170,10 +177,6 @@ google.com/voice services
 		# Delete
 		$vm->delete;
 	}
-
-	# connect call & cancel it
-	my $call = $g->call( '+15555555555' => '+14444444444' );
-	$call->cancel;
 
 =head1 METHODS
 
