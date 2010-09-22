@@ -26,15 +26,17 @@ Example
 	my $call = $g->call( '+15555555555' => '+14444444444' );
 	$call->cancel;
 	
-	# voicemail
+	# loop through voicemail messages
 	foreach my $vm ( $g->voicemail ) {
-	
-		# name & transcribed text
-		print $vm->name;
-		print $vm->text;
-	
-		# store message
-		$vm->download->move_to('/directory/' . $vm->id . "/vm.mp3');
-	
+
+		# Name, number, and transcribed text
+		print $vm->name . "\n";
+		print $vm->meta->{phoneNumber} . "\n";
+		print $vm->text . "\n";
+		
+		# Download mp3
+		$vm->download->move_to( $vm->id . '.mp3' );
+
+		# Delete
 		$vm->delete;
 	}
