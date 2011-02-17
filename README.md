@@ -1,12 +1,16 @@
-Google Voice library for Perl.  
+# Google Voice library for Perl
 
  - Handles all google voice functions
  - No parsing required - all data available in perl objects
  - Only two pre-requisites:
- 	- Mojolicious
-	- IO::Socket::SSL
+    - Mojolicious
+    - IO::Socket::SSL
 
-Example
+
+## CPAN
+<a href="http://search.cpan.org/dist/Google-Voice/">http://search.cpan.org/dist/Google-Voice/</a>
+
+## Example
 
 	use Google::Voice;
 	
