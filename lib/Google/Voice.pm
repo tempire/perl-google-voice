@@ -12,6 +12,8 @@ use Google::Voice::Call;
 
 use base 'Mojo::Base';
 
+our $VERSION = 0.02;
+
 __PACKAGE__->attr([qw/ client rnr_se /]);
 
 sub new {
