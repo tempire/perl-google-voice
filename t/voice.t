@@ -47,15 +47,6 @@ like $vm->text, qr/^[\w\s\.',]+$/, 'transcription';
 ok my $asset = $vm->download, 'voicemail';
 ok $asset->size, $asset->size . ' bytes';
 
-# call recording
-ok my $node = ($g->recorded)[0], 'recorded calls';
-is $node->name, $rec_name, 'name';
-is $node->meta->{phoneNumber}, $rec_phone, 'phone';
-
-# download recording
-ok $asset = $node->download, 'recording';
-ok $asset->size, $asset->size . ' bytes';
-
 # sms
 ok !$g->send_sms('invalid #' => 'message'), 'sms fail';
 is $@, 20, 'error';
@@ -103,3 +94,12 @@ for my $feed (qw/ recorded placed received missed starred trash /) {
     ok my $node = ($g->$feed)[0], "$feed feed item";
     is $node->type, $feed, 'type';
 }
+
+# call recording
+ok my $node = ($g->recorded)[0], 'recorded calls';
+is $node->name, $rec_name, 'name';
+is $node->meta->{phoneNumber}, $rec_phone, 'phone';
+
+# download recording
+ok $asset = $node->download, 'recording';
+ok $asset->size, $asset->size . ' bytes';

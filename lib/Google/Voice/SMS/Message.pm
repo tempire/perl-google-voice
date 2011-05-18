@@ -5,9 +5,9 @@ use warnings;
 
 use Mojo::ByteStream;
 
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
-__PACKAGE__->attr([qw/ text time inbound outbound xml rnr_se client /]);
+__PACKAGE__->attr([qw/ text time inbound outbound xml rnr_se ua /]);
 
 sub new {
     my $self = bless {}, shift;
@@ -15,7 +15,7 @@ sub new {
     my $meta = shift;
 
     $self->rnr_se(shift);
-    $self->client(shift);
+    $self->ua(shift);
 
     my $from =
       Mojo::ByteStream->new($xml->at('.gc-message-sms-from')->text)->trim;

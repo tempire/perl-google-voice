@@ -3,23 +3,23 @@ package Google::Voice;
 use strict;
 use warnings;
 
-use Mojo::Client;
+use Mojo::UserAgent;
 use Mojo::JSON;
 use IO::Socket::SSL 1.37;
 
 use Google::Voice::Feed;
 use Google::Voice::Call;
 
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
-__PACKAGE__->attr([qw/ client rnr_se /]);
+__PACKAGE__->attr([qw/ ua rnr_se /]);
 
 sub new {
     my $self = bless {}, shift;
 
-    $self->client(Mojo::Client->new);
+    $self->ua(Mojo::UserAgent->new);
 
     return $self;
 }
@@ -27,7 +27,7 @@ sub new {
 sub login {
     my $self = shift;
     my ($user, $pass) = @_;
-    my $c = $self->client;
+    my $c = $self->ua;
 
     # GALX value
     my $el =
@@ -60,7 +60,7 @@ sub login {
 
 sub send_sms {
     my $self = shift;
-    my $c    = $self->client;
+    my $c    = $self->ua;
     my ($phone, $content) = @_;
 
     my $json = $c->post_form(
@@ -93,7 +93,7 @@ sub feed {
     my $self = shift;
     my $url  = shift;
 
-    my $c = $self->client;
+    my $c = $self->ua;
 
     # Multiple conversations
     my $inbox = $c->get($url)->res->dom;
@@ -114,7 +114,7 @@ sub call {
     my $self = shift;
     my ($from, $to) = @_;
 
-    my $json = $self->client->post_form(
+    my $json = $self->ua->post_form(
         'https://www.google.com/voice/call/connect' => {
             forwardingNumber => $from,
             outgoingNumber   => $to,
@@ -126,7 +126,7 @@ sub call {
 
     $@ = $json->{error} and return unless $json->{ok};
 
-    return Google::Voice::Call->new(@_, $self->rnr_se, $self->client);
+    return Google::Voice::Call->new(@_, $self->rnr_se, $self->ua);
 }
 
 1;
@@ -236,15 +236,11 @@ List of all items (call, sms, or voicemail)
 
 =head1 SEE ALSO
 
-L<Mojo::Client>, L<Mojo::DOM>
+L<Mojo::UserAgent>, L<Mojo::DOM>
 
 =head1 DEVELOPMENT
 
 L<http://github.com/tempire/perl-google-voice>
-
-=head1 VERSION
-
-0.02
 
 =head1 AUTHOR
 

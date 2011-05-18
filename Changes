@@ -1,0 +1,4 @@
+0.03 2011-05-18
+  - Replaced Mojo::Client with Mojo::UserAgent
+  - Replaced use base "Mojo::Base" with newer style:
+      use Mojo::Base -base

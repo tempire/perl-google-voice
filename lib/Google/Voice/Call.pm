@@ -3,9 +3,9 @@ package Google::Voice::Call;
 use strict;
 use warnings;
 
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
-__PACKAGE__->attr([qw/ from to rnr_se client /]);
+__PACKAGE__->attr([qw/ from to rnr_se ua /]);
 
 sub new {
     my $self = bless {}, shift;
@@ -13,7 +13,7 @@ sub new {
     $self->from(shift);
     $self->to(shift);
     $self->rnr_se(shift);
-    $self->client(shift);
+    $self->ua(shift);
 
     return $self;
 }
@@ -22,7 +22,7 @@ sub cancel {
     my $self = shift;
     my ($from, $to) = @_;
 
-    my $json = $self->client->post_form(
+    my $json = $self->ua->post_form(
         'https://www.google.com/voice/call/cancel/' => {
             forwardingNumber => undef,
             outgoingNumber   => undef,

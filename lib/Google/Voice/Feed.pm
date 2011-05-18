@@ -5,7 +5,7 @@ use warnings;
 
 use Google::Voice::SMS::Message;
 
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
 use constant FEED_TYPE => {
     2  => 'voicemail',
@@ -18,14 +18,14 @@ use constant FEED_TYPE => {
     10 => 'starred',
 };
 
-__PACKAGE__->attr([qw/ xml id type name meta text rnr_se client /]);
+__PACKAGE__->attr([qw/ xml id type name meta text rnr_se ua /]);
 
 sub new {
     my $self   = bless {}, shift;
     my $xml    = shift;
     my $meta   = shift;
     my $rnr_se = shift;
-    my $client = shift;
+    my $ua     = shift;
 
     $self->xml($xml);
     $self->id($xml->attrs->{id});
@@ -38,7 +38,7 @@ sub new {
     );
 
     $self->rnr_se($rnr_se);
-    $self->client($client);
+    $self->ua($ua);
 
     return $self;
 }
@@ -49,7 +49,7 @@ sub messages {
     # Each text message is a span.gc-message-sms-row
     return
       map Google::Voice::SMS::Message->new($_, $self->meta, $self->rnr_se,
-        $self->client),
+        $self->ua),
       @{$self->xml->find('.gc-message-sms-row')};
 }
 
@@ -58,7 +58,7 @@ sub latest { return (shift->messages)[-1] }
 sub delete {
     my $self = shift;
 
-    my $json = $self->client->post_form(
+    my $json = $self->ua->post_form(
         'https://www.google.com/voice/inbox/deleteMessages' => {
             messages => $self->id,
             trash    => 1,
@@ -75,7 +75,7 @@ sub download {
     my $self = shift;
     my ($from, $to) = @_;
 
-    my $res = $self->client->get(
+    my $res = $self->ua->get(
         'https://www.google.com/voice/media/send_voicemail/' . $self->id)
       ->res;
 
