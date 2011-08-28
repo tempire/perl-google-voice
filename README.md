@@ -7,8 +7,11 @@
     - IO::Socket::SSL
 
 
-## CPAN
-<a href="http://search.cpan.org/dist/Google-Voice/">http://search.cpan.org/dist/Google-Voice/</a>
+## Install
+
+curl -L cpanmin.us | perl - Google::Voice
+
+<a href="https://metacpan.org/module/Google::Voice">https://metacpan.org/module/Google::Voice</a>
 
 ## Example
 
