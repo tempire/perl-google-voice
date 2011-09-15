@@ -12,7 +12,7 @@ use Google::Voice::Call;
 
 use Mojo::Base -base;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 __PACKAGE__->attr([qw/ ua rnr_se /]);
 
@@ -31,13 +31,13 @@ sub login {
 
     # GALX value
     my $el =
-      $c->get('https://www.google.com/accounts/ServiceLogin')
+      $c->get('https://accounts.google.com/ServiceLogin')
       ->res->dom->at('input[name="GALX"]');
 
     my $galx = $el->attrs->{value} if $el;
 
     $c->post_form(
-        'https://www.google.com/accounts/ServiceLoginAuth',
+        'https://accounts.google.com/ServiceLogin',
         {   Email  => $user,
             Passwd => $pass,
             GALX   => $galx,
@@ -245,5 +245,9 @@ L<http://github.com/tempire/perl-google-voice>
 =head1 AUTHOR
 
 Glen Hinkle tempire@cpan.org
+
+=head1 CREDITS
+
+David Jones
 
 =cut

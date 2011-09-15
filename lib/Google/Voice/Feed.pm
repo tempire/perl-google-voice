@@ -34,7 +34,7 @@ sub new {
     $self->type(FEED_TYPE->{$self->meta->{type}});
 
     $self->text(
-        "@{[map $_->text, @{$xml->find('.gc-message-message-display > span')}]}"
+        "@{[map $_->text, @{$xml->find('.gc-orig-trans > span')}]}"
     );
 
     $self->rnr_se($rnr_se);

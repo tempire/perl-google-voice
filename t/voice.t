@@ -41,7 +41,7 @@ ok my $g = Google::Voice->new->login(@auth), 'correct auth';
 ok my $vm = ($g->voicemail)[0], 'voicemail inbox';
 is $vm->name, $vm_name, 'name';
 is $vm->meta->{phoneNumber}, $vm_phone, 'phone';
-like $vm->text, qr/^[\w\s\.',]+$/, 'transcription';
+like $vm->text, qr/^[\w\s]+/, 'transcription';
 
 # download voicemail
 ok my $asset = $vm->download, 'voicemail';
