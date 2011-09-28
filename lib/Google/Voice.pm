@@ -29,6 +29,8 @@ sub login {
     my ($user, $pass) = @_;
     my $c = $self->ua;
 
+    $c->max_redirects(4);    # Google seems to like redirects everywhere
+
     # GALX value
     my $el =
       $c->get('https://accounts.google.com/ServiceLogin')
@@ -45,7 +47,6 @@ sub login {
     );
 
     # rnr_se required for subsequent requests
-    $c->max_redirects(4);    # 3-4 redirects before rnr_se is available
     $el =
       $c->get('https://www.google.com/voice#inbox')
       ->res->dom->at('input[name="_rnr_se"]');
