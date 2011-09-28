@@ -27,9 +27,11 @@ sub new {
     my $rnr_se = shift;
     my $ua     = shift;
 
+    my $name = $xml->at('.gc-message-name-link')->text || "Unknown";
+
     $self->xml($xml);
     $self->id($xml->attrs->{id});
-    $self->name($xml->at('.gc-message-name-link')->text);
+    $self->name($name);
     $self->meta($meta->{messages}->{$self->id});
     $self->type(FEED_TYPE->{$self->meta->{type}});
 
