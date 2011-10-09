@@ -91,6 +91,7 @@ ok + ($g->spam)[0], 'spam feed';
 
 # all other feeds
 for my $feed (qw/ recorded placed received missed starred trash /) {
+    note "Feed $feed";
     ok my $node = ($g->$feed)[0], "$feed feed item";
     is $node->type, $feed, 'type';
 }
