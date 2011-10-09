@@ -1,3 +1,8 @@
+0.05 2011-10-08
+  - Changed max_redirects to 6 (Graham Forest, discogestalt)
+  - Feed message name more robust (Graham Forest, tempire)
+  - Changed placed feed code from 13 to 7
+
 0.04 2011-09-14
   - Google changed URL for log in, and markup for vm transcription (David Jones)
 

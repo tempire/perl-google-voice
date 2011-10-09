@@ -12,7 +12,7 @@ use Google::Voice::Call;
 
 use Mojo::Base -base;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 __PACKAGE__->attr([qw/ ua rnr_se /]);
 
@@ -29,7 +29,7 @@ sub login {
     my ($user, $pass) = @_;
     my $c = $self->ua;
 
-    $c->max_redirects(4);    # Google seems to like redirects everywhere
+    $c->max_redirects(6);    # Google seems to like redirects everywhere
 
     # GALX value
     my $el =
@@ -250,5 +250,7 @@ Glen Hinkle tempire@cpan.org
 =head1 CREDITS
 
 David Jones
+
+Graham Forest
 
 =cut

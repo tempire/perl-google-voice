@@ -13,7 +13,7 @@ plan skip_all => 'Set TEST_ONLINE environment variable to enable tests. '
 warn
   'NOTE: Environment variables must be set in t/voice.t for tests to succeed';
 
-plan tests => 50;
+plan tests => 46;
 
 # Full name on account
 my $name  = $ENV{GVNAME};
@@ -89,11 +89,12 @@ ok $call->cancel, 'cancel';
 ok + ($g->all)[0],  'all feed';
 ok + ($g->spam)[0], 'spam feed';
 
-# all other feeds
-for my $feed (qw/ recorded placed received missed starred trash /) {
+# other feeds
+for my $feed (qw/ placed received missed trash /) {
     note "Feed $feed";
     ok my $node = ($g->$feed)[0], "$feed feed item";
-    is $node->type, $feed, 'type';
+    is $node->type, $feed, 'type'
+      or diag 'Type code: ' . $node->meta->{type};
 }
 
 # call recording

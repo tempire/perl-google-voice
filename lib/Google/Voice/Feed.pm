@@ -11,7 +11,7 @@ use constant FEED_TYPE => {
     2  => 'voicemail',
     10 => 'sms',
     4  => 'recorded',
-    13 => 'placed',
+    7  => 'placed',
     1  => 'received',
     0  => 'missed',
     11 => 'trash',
@@ -27,11 +27,9 @@ sub new {
     my $rnr_se = shift;
     my $ua     = shift;
 
-    my $name = $xml->at('.gc-message-name-link')->text || "Unknown";
-
     $self->xml($xml);
     $self->id($xml->attrs->{id});
-    $self->name($name);
+    $self->name($self->_message_name($xml->at('.gc-message-name-link')));
     $self->meta($meta->{messages}->{$self->id});
     $self->type(FEED_TYPE->{$self->meta->{type}});
 
@@ -43,6 +41,15 @@ sub new {
     $self->ua($ua);
 
     return $self;
+}
+
+sub _message_name {
+  my $self = shift;
+  my $node = shift;
+
+  return $node->text if $node;
+  
+  return '';
 }
 
 sub messages {
