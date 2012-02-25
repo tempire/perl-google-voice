@@ -90,6 +90,13 @@ for my $feed (
     };
 }
 
+{
+	no strict 'refs';
+	*{"Google::Voice::search"} = sub {
+		shift->feed('https://www.google.com/voice/inbox/search?q='.shift);
+	};
+}
+
 sub feed {
     my $self = shift;
     my $url  = shift;
@@ -179,7 +186,23 @@ Easy interface for google voice
 
         # Delete
         $vm->delete;
+
+        # And/or Delete Forever
+        $vm->deleteforever;
     }
+
+    # Delete Forever messages in Trash from Larry
+    foreach my $msg ($g->search('Larry')) {
+
+       next unless $msg->meta->{isTrash};
+
+       print $msg->name . "\n";
+       print "Labels: ", join(", ", @{$msg->meta->{labels}}), "\n";
+
+       # Delete Forever
+       $msg->deleteforever;
+    }
+
 
 =head1 METHODS
 
@@ -234,6 +257,18 @@ List of items marked as spam (call, sms, or voicemail)
 =head2 all
 
 List of all items (call, sms, or voicemail)
+
+=head2 search
+
+List of search results (call, sms, or voicemail)
+
+=head2 delete
+
+Delete message (remove all labels; move to Trash)
+
+=head2 deleteforever
+
+Delete message forever.  Message does not need to be deleted first.
 
 =head1 SEE ALSO
 
