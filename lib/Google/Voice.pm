@@ -11,6 +11,7 @@ use Google::Voice::Feed;
 use Google::Voice::Call;
 
 use Mojo::Base -base;
+use URI::Escape;
 
 our $VERSION = 0.05;
 
@@ -93,7 +94,7 @@ for my $feed (
 {
 	no strict 'refs';
 	*{"Google::Voice::search"} = sub {
-		shift->feed('https://www.google.com/voice/inbox/search?q='.shift);
+		shift->feed('https://www.google.com/voice/inbox/search?q='.uri_escape(shift));
 	};
 }
 
