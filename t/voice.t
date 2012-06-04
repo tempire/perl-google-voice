@@ -71,6 +71,7 @@ ok $m[1]->outbound, 'outbound';
 ok !$m[1]->inbound, 'not inbound';
 like $m[1]->time, qr/^\d{1,2}:\d{2} \w{2}$/, 'time';
 is $m[1]->text, 'A', 'text';
+like $m[1]->from, qr/\Q$ENV{GVPHONE}\E/, 'from';
 
 ok $conv->latest->outbound, 'latest message';
 
