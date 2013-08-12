@@ -1,0 +1,67 @@
+* Change "post_form" method to "post"
+  
+  The following error was encountered on Monday, August 12, 2013 using Google::Voice version 0.05:
+  #+BEGIN_EXAMPLE
+    Can't locate object method "post_form" via package "Mojo::UserAgent" at /home/troy/perl5/lib/perl5/Google/Voice.pm line 41.
+  #+END_EXAMPLE
+
+  "post_form" is an obsolete method. See http://mojolicio.us/perldoc/Mojo/UserAgent#post for post examples:
+
+  #+BEGIN_SRC perl
+    my $tx = $ua->post('example.com');
+    my $tx = $ua->post('http://example.com' => {DNT => 1} => 'Hi!');
+    my $tx = $ua->post(
+        'http://example.com' => {DNT => 1} => form => {a => 'b'});
+    my $tx = $ua->post(
+        'http://example.com' => {DNT => 1} => json => {a => 'b'});
+  #+END_SRC
+
+  Here's the line in Voice.pm that causes the errors:
+  #+BEGIN_SRC perl
+    $c->post_form(
+        'https://accounts.google.com/ServiceLogin',
+        {   Email  => $user,
+            Passwd => $pass,
+            GALX   => $galx,
+        }
+    );
+  #+END_SRC
+
+  And here's the modified line:
+
+  #+BEGIN_SRC perl :tangle patch01.pl
+    $c->post(
+        'https://accounts.google.com/ServiceLogin' => form =>
+        {   Email  => $user,
+            Passwd => $pass,
+            GALX   => $galx,
+        }
+    );
+  #+END_SRC
+* Change post_form method in send_sms
+
+  Here's the line in Voice.pm that causes the errors:
+
+  #+BEGIN_SRC perl
+    my $json = $c->post_form(
+        'https://www.google.com/voice/b/0/sms/send',
+        {   id          => undef,
+            phoneNumber => $phone,
+            text        => $content || '',
+            _rnr_se     => $self->rnr_se
+        }
+    )->res->json;
+  #+END_SRC
+
+  And here's the fix:
+  
+  #+BEGIN_SRC perl :tangle patch02.pl
+    my $json = $c->post(
+        'https://www.google.com/voice/b/0/sms/send' => form => 
+        {   id          => undef,
+            phoneNumber => $phone,
+            text        => $content || '',
+            _rnr_se     => $self->rnr_se
+        }
+    )->res->json;
+  #+END_SRC
