@@ -38,12 +38,12 @@ sub login {
 
     my $galx = $el->attrs->{value} if $el;
 
-    $c->post_form(
-        'https://accounts.google.com/ServiceLogin',
-        {   Email  => $user,
-            Passwd => $pass,
-            GALX   => $galx,
-        }
+    $c->post(
+	'https://accounts.google.com/ServiceLogin' => form =>
+	{   Email  => $user,
+	    Passwd => $pass,
+	    GALX   => $galx,
+	}
     );
 
     # rnr_se required for subsequent requests
