@@ -64,14 +64,15 @@ sub send_sms {
     my $c    = $self->ua;
     my ($phone, $content) = @_;
 
-    my $json = $c->post_form(
-        'https://www.google.com/voice/b/0/sms/send',
-        {   id          => undef,
-            phoneNumber => $phone,
-            text        => $content || '',
-            _rnr_se     => $self->rnr_se
-        }
+    my $json = $c->post(
+	'https://www.google.com/voice/b/0/sms/send' => form => 
+	{   id          => undef,
+	    phoneNumber => $phone,
+	    text        => $content || '',
+	    _rnr_se     => $self->rnr_se
+	}
     )->res->json;
+    
 
     $@ = $json->{data}->{code} and return unless $json->{ok};
 
