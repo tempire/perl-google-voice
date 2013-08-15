@@ -116,15 +116,17 @@ sub call {
     my $self = shift;
     my ($from, $to) = @_;
 
-    my $json = $self->ua->post_form(
-        'https://www.google.com/voice/call/connect' => {
-            forwardingNumber => $from,
-            outgoingNumber   => $to,
-            phoneType        => 1,
-            remember         => 0,
-            _rnr_se          => $self->rnr_se
-        }
-    )->res->json;
+
+    my $json = $self->ua->post(
+	'https://www.google.com/voice/call/connect' => form =>
+	{
+	    forwardingNumber => $from,
+	    outgoingNumber   => $to,
+	    phoneType        => 1,
+	    remember         => 0,
+	    _rnr_se          => $self->rnr_se
+	}
+   ) ->res->json;
 
     $@ = $json->{error} and return unless $json->{ok};
 

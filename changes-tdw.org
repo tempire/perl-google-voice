@@ -65,3 +65,30 @@
         }
     )->res->json;
   #+END_SRC
+* Change post_form method in send_sms
+  Here's the line in Voice.pm that causes the errors:
+  #+BEGIN_SRC perl
+    my $json = $self->ua->post_form(
+        'https://www.google.com/voice/call/connect' => {
+            forwardingNumber => $from,
+            outgoingNumber   => $to,
+            phoneType        => 1,
+            remember         => 0,
+            _rnr_se          => $self->rnr_se
+        }
+    )->res->json;
+  #+END_SRC
+  
+  And here's the fix:
+  #+BEGIN_SRC perl :tangle patch03.pl
+    my $json = $self->ua->post(
+        'https://www.google.com/voice/call/connect' => form =>
+        {
+            forwardingNumber => $from,
+            outgoingNumber   => $to,
+            phoneType        => 1,
+            remember         => 0,
+            _rnr_se          => $self->rnr_se
+        }
+    )->res->json;
+  #+END_SRC
