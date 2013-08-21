@@ -73,7 +73,6 @@ sub send_sms {
 	}
     )->res->json;
     
-
     $@ = $json->{data}->{code} and return unless $json->{ok};
 
     return $json->{ok};
@@ -116,6 +115,7 @@ sub call {
     my $self = shift;
     my ($from, $to) = @_;
 
+    print "from: $from, to: $to\n";
 
     my $json = $self->ua->post(
 	'https://www.google.com/voice/call/connect' => form =>
@@ -126,7 +126,9 @@ sub call {
 	    remember         => 0,
 	    _rnr_se          => $self->rnr_se
 	}
-   ) ->res->json;
+    ) ->res->json;
+
+    print "=> $json\n";
 
     $@ = $json->{error} and return unless $json->{ok};
 
