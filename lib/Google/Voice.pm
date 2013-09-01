@@ -12,7 +12,7 @@ use Google::Voice::Call;
 
 use Mojo::Base -base;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 __PACKAGE__->attr([qw/ ua rnr_se /]);
 

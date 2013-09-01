@@ -1,3 +1,6 @@
+0.06 2013-09-01
+  - Moved post_form to post(form) for Mojolicious 4.xx
+
 0.05 2011-10-08
   - Changed max_redirects to 6 (Graham Forest, discogestalt)
   - Feed message name more robust (Graham Forest, tempire)

@@ -8,32 +8,32 @@ use Mojo::Base -base;
 __PACKAGE__->attr([qw/ from to rnr_se ua /]);
 
 sub new {
-    my $self = bless {}, shift;
+  my $self = bless {}, shift;
 
-    $self->from(shift);
-    $self->to(shift);
-    $self->rnr_se(shift);
-    $self->ua(shift);
+  $self->from(shift);
+  $self->to(shift);
+  $self->rnr_se(shift);
+  $self->ua(shift);
 
-    return $self;
+  return $self;
 }
 
 sub cancel {
-    my $self = shift;
-    my ($from, $to) = @_;
+  my $self = shift;
+  my ($from, $to) = @_;
 
-    my $json = $self->ua->post_form(
-        'https://www.google.com/voice/call/cancel/' => {
-            forwardingNumber => undef,
-            outgoingNumber   => undef,
-            cancelType       => 'C2C',
-            _rnr_se          => $self->rnr_se
-        }
-    )->res->json;
+  my $json = $self->ua->post(
+    'https://www.google.com/voice/call/cancel/' => form => {
+      forwardingNumber => undef,
+      outgoingNumber   => undef,
+      cancelType       => 'C2C',
+      _rnr_se          => $self->rnr_se
+    }
+  )->res->json;
 
-    $@ = $json->{data}->{code} and return unless $json->{ok};
+  $@ = $json->{data}->{code} and return unless $json->{ok};
 
-    return $json->{ok};
+  return $json->{ok};
 }
 
 1;

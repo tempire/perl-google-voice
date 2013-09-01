@@ -8,39 +8,37 @@ use Google::Voice::SMS::Message;
 use Mojo::Base -base;
 
 use constant FEED_TYPE => {
-    2  => 'voicemail',
-    10 => 'sms',
-    4  => 'recorded',
-    7  => 'placed',
-    1  => 'received',
-    0  => 'missed',
-    11 => 'trash',
-    10 => 'starred',
+  2  => 'voicemail',
+  10 => 'sms',
+  4  => 'recorded',
+  7  => 'placed',
+  1  => 'received',
+  0  => 'missed',
+  11 => 'trash',
+  10 => 'starred',
 };
 
 __PACKAGE__->attr([qw/ xml id type name meta text rnr_se ua /]);
 
 sub new {
-    my $self   = bless {}, shift;
-    my $xml    = shift;
-    my $meta   = shift;
-    my $rnr_se = shift;
-    my $ua     = shift;
+  my $self   = bless {}, shift;
+  my $xml    = shift;
+  my $meta   = shift;
+  my $rnr_se = shift;
+  my $ua     = shift;
 
-    $self->xml($xml);
-    $self->id($xml->attrs->{id});
-    $self->name($self->_message_name($xml->at('.gc-message-name-link')));
-    $self->meta($meta->{messages}->{$self->id});
-    $self->type(FEED_TYPE->{$self->meta->{type}});
+  $self->xml($xml);
+  $self->id($xml->attrs->{id});
+  $self->name($self->_message_name($xml->at('.gc-message-name-link')));
+  $self->meta($meta->{messages}->{$self->id});
+  $self->type(FEED_TYPE->{$self->meta->{type}});
 
-    $self->text(
-        "@{[map $_->text, @{$xml->find('.gc-orig-trans > span')}]}"
-    );
+  $self->text("@{[map $_->text, @{$xml->find('.gc-orig-trans > span')}]}");
 
-    $self->rnr_se($rnr_se);
-    $self->ua($ua);
+  $self->rnr_se($rnr_se);
+  $self->ua($ua);
 
-    return $self;
+  return $self;
 }
 
 sub _message_name {
@@ -48,49 +46,49 @@ sub _message_name {
   my $node = shift;
 
   return $node->text if $node;
-  
+
   return '';
 }
 
 sub messages {
-    my $self = shift;
+  my $self = shift;
 
-    # Each text message is a span.gc-message-sms-row
-    return
-      map Google::Voice::SMS::Message->new($_, $self->meta, $self->rnr_se,
-        $self->ua),
-      @{$self->xml->find('.gc-message-sms-row')};
+  # Each text message is a span.gc-message-sms-row
+  return
+    map Google::Voice::SMS::Message->new($_, $self->meta, $self->rnr_se,
+    $self->ua),
+    @{$self->xml->find('.gc-message-sms-row')};
 }
 
 sub latest { return (shift->messages)[-1] }
 
 sub delete {
-    my $self = shift;
 
-    my $json = $self->ua->post_form(
-        'https://www.google.com/voice/inbox/deleteMessages' => {
-            messages => $self->id,
-            trash    => 1,
-            _rnr_se  => $self->rnr_se
-        }
-    )->res->json;
+  my $self = shift;
 
-    $@ = $json->{data}->{code} and return unless $json->{ok};
+  my $json = $self->ua->post(
+    'https://www.google.com/voice/inbox/deleteMessages' => form => {
+      messages => $self->id,
+      trash    => 1,
+      _rnr_se  => $self->rnr_se
+    }
+  )->res->json;
 
-    return $json->{ok};
+  $@ = $json->{data}->{code} and return unless $json->{ok};
+
+  return $json->{ok};
 }
 
 sub download {
-    my $self = shift;
-    my ($from, $to) = @_;
+  my $self = shift;
+  my ($from, $to) = @_;
 
-    my $res = $self->ua->get(
-        'https://www.google.com/voice/media/send_voicemail/' . $self->id)
-      ->res;
+  my $res = $self->ua->get(
+    'https://www.google.com/voice/media/send_voicemail/' . $self->id)->res;
 
-    $@ = $res->message and return if $res->code != 200;
+  $@ = $res->message and return if $res->code != 200;
 
-    return $res->content->asset;
+  return $res->content->asset;
 }
 
 1;
