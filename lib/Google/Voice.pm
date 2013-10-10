@@ -36,7 +36,7 @@ sub login {
       $c->get('https://accounts.google.com/ServiceLogin')
       ->res->dom->at('input[name="GALX"]');
 
-    my $galx = $el->attrs->{value} if $el;
+    my $galx = $el->attr->{value} if $el;
 
     $c->post(
         'https://accounts.google.com/ServiceLogin',
@@ -54,7 +54,7 @@ sub login {
     # Login not accepted
     return unless $el;
 
-    $self->rnr_se($el->attrs->{value});
+    $self->rnr_se($el->attr->{value});
 
     return $self;
 }
