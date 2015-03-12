@@ -5,6 +5,7 @@ use warnings;
 
 use Mojo::UserAgent;
 use Mojo::JSON;
+use Mojo::ByteStream qw(b);
 use IO::Socket::SSL 1.37;
 
 use Google::Voice::Feed;
@@ -100,7 +101,7 @@ sub feed {
     my $inbox = $c->get($url)->res->dom;
 
     # metadata
-    my $meta = Mojo::JSON->new->decode($inbox->at('response > json')->text);
+    my $meta = Mojo::JSON->new->decode( b($inbox->at('response > json')->text)->encode('UTF-8') );
 
     # content
     my $xml = Mojo::DOM->new->parse($inbox->at('response > html')->text);
