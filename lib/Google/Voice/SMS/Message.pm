@@ -7,7 +7,7 @@ use Mojo::ByteStream;
 
 use Mojo::Base -base;
 
-__PACKAGE__->attr([qw/ text time inbound outbound xml rnr_se ua /]);
+__PACKAGE__->attr([qw/ text time inbound outbound xml rnr_se ua from/]);
 
 sub new {
     my $self = bless {}, shift;
@@ -25,6 +25,7 @@ sub new {
 
     $self->xml($xml);
     $self->text($xml->at('.gc-message-sms-text')->text);
+    $self->from($from);
     $self->time($time);
     $self->inbound($from eq 'Me:');
     $self->outbound($from ne 'Me:');
@@ -46,6 +47,8 @@ One message in an sms conversation
 
   print "Inbound message" if $sms_message->inbound;
   print $sms_message->text;
+  print $sms_message->from;
+  print $sms_message->time;
 
 =head1 ATTRIBUTES
 
