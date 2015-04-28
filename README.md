@@ -51,3 +51,16 @@ curl -L cpanmin.us | perl - Google::Voice
         # Delete
         $vm->delete;
     }
+
+    # Delete Forever messages in Trash from Larry
+    foreach my $msg ($g->search('Larry')) {
+
+       next unless $msg->meta->{isTrash};
+
+       print $msg->name . "\n";
+       print "Labels: ", join(", ", @{$msg->meta->{labels}}), "\n";
+
+       # Delete Forever
+       $msg->deleteforever;
+    }
+

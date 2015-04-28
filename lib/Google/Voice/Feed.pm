@@ -79,6 +79,21 @@ sub delete {
   return $json->{ok};
 }
 
+sub deleteforever {
+    my $self = shift;
+
+    my $json = $self->ua->post_form(
+        'https://www.google.com/voice/inbox/deleteForeverMessages' => {
+            messages => $self->id,
+            _rnr_se  => $self->rnr_se
+        }
+    )->res->json;
+
+    $@ = $json->{data}->{code} and return unless $json->{ok};
+
+    return $json->{ok};
+}
+
 sub download {
   my $self = shift;
   my ($from, $to) = @_;
