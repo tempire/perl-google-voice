@@ -28,7 +28,7 @@ sub new {
   my $ua     = shift;
 
   $self->xml($xml);
-  $self->id($xml->attrs->{id});
+  $self->id($xml->attr->{id});
   $self->name($self->_message_name($xml->at('.gc-message-name-link')));
   $self->meta($meta->{messages}->{$self->id});
   $self->type(FEED_TYPE->{$self->meta->{type}});
